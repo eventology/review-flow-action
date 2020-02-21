@@ -5,7 +5,7 @@ import { Octokit } from "@octokit/rest"
 type PullRequest = Octokit.PullsListResponseItem
 type CheckRun = Octokit.ChecksListForRefResponseCheckRunsItem
 
-const token = core.getInput("token", { required: true })
+const token = core.getInput("token")
 const github = new GitHub(token)
 
 const repoParams = {
