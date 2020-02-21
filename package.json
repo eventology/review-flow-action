@@ -1,14 +1,14 @@
 {
-  "name": "typescript-action",
-  "version": "0.0.0",
+  "name": "review-flow-action",
+  "version": "1.0.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "GitHub action for automating PR review flow",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write **/*.ts",
-    "format-check": "prettier --check **/*.ts",
-    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write \"**/*.@(ts|js|json)\"",
+    "format-check": "prettier --check \"**/*.@(ts|js|json)\"",
+    "lint": "eslint src --ext ts",
     "pack": "ncc build",
     "test": "jest",
     "all": "npm run build && npm run format && npm run lint && npm run pack && npm test"
@@ -22,12 +22,13 @@
     "node",
     "setup"
   ],
-  "author": "YourNameOrOrganization",
+  "author": "eventology",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.0"
   },
   "devDependencies": {
+    "@eventology/eslint-config": "^2.0.1",
     "@types/jest": "^24.0.23",
     "@types/node": "^12.7.12",
     "@typescript-eslint/parser": "^2.8.0",
@@ -41,5 +42,14 @@
     "prettier": "^1.19.1",
     "ts-jest": "^24.2.0",
     "typescript": "^3.6.4"
+  },
+  "prettier": {
+    "semi": false,
+    "trailingComma": "all",
+    "arrowParens": "always",
+    "quoteProps": "consistent"
+  },
+  "eslintConfig": {
+    "extends": "@eventology/eslint-config"
   }
 }
