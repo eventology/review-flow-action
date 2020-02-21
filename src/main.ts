@@ -1,5 +1,5 @@
 import * as core from "@actions/core"
-import { GitHub } from "@actions/github"
+import { context, GitHub } from "@actions/github"
 import { Octokit } from "@octokit/rest"
 
 type PullRequest = Octokit.PullsListResponseItem
@@ -9,8 +9,8 @@ const token = core.getInput("token")
 const github = new GitHub(token)
 
 const repoParams = {
-  owner: "kingdaro",
-  repo: "bookish-waffle",
+  owner: context.repo.owner,
+  repo: context.repo.repo,
 }
 
 const shouldMerge = async (pr: PullRequest) =>
