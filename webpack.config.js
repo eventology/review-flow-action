@@ -13,8 +13,7 @@ module.exports = {
       {
         test: /\.(js|ts)$/,
         include: join(__dirname, "src"),
-        use: "ts-loader",
-        options: { transpileOnly: true },
+        use: { loader: "ts-loader", options: { transpileOnly: true } },
       },
     ],
   },
