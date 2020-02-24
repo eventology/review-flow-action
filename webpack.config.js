@@ -10,7 +10,12 @@ module.exports = {
   },
   module: {
     rules: [
-      { test: /\.(js|ts)$/, use: "ts-loader", include: join(__dirname, "src") },
+      {
+        test: /\.(js|ts)$/,
+        include: join(__dirname, "src"),
+        use: "ts-loader",
+        options: { transpileOnly: true },
+      },
     ],
   },
   resolve: {
