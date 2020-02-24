@@ -8,6 +8,11 @@ on:
       - "releases/*"
 
 jobs:
+  build:
+    - uses: actions/checkout@v1
+    - run: |
+        yarn
+        yarn run build
   lint:
     runs-on: ubuntu-latest
     steps:
