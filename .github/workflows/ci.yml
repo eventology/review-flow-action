@@ -1,5 +1,4 @@
-name: "build-test"
-on: # rebuild any PRs and main branch changes
+on:
   pull_request:
   push:
     branches:
@@ -7,10 +6,17 @@ on: # rebuild any PRs and main branch changes
       - "releases/*"
 
 jobs:
-  lint: # make sure build/ci work properly
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - run: |
           yarn
           yarn run lint
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: |
+          yarn
+          yarn test
