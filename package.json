@@ -9,6 +9,7 @@
     "format": "prettier --write \"**/*.@(ts|js|json)\"",
     "format-check": "prettier --check \"**/*.@(ts|js|json)\"",
     "lint": "eslint src --ext ts",
+    "typecheck": "tsc --noEmit",
     "test": "jest"
   },
   "repository": {

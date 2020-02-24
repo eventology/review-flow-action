@@ -21,6 +21,13 @@ jobs:
       - run: |
           yarn
           yarn run lint
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: |
+          yarn
+          yarn run typecheck
   test:
     runs-on: ubuntu-latest
     steps:
