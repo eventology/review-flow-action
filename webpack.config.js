@@ -20,6 +20,6 @@ module.exports = {
   resolve: {
     extensions: [".js", ".ts"],
   },
-  mode: "none",
+  mode: "production",
   target: "node",
 }
