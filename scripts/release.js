@@ -29,7 +29,7 @@ async function main() {
   execSync(`git push origin master`)
 
   // push to releases/{version}
-  execSync(`git push origin master:releases/${newVersion}`)
+  execSync(`git push origin master:releases/v${newVersion}`)
 
   console.info("Success!")
 }
