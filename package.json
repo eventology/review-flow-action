@@ -13,7 +13,8 @@
     "test": "jest",
     "ci": "npm-run-all --parallel --print-label build lint test typecheck",
     "postinstall": "typesync",
-    "postuninstall": "typesync"
+    "postuninstall": "typesync",
+    "release": "node scripts/release.js"
   },
   "repository": {
     "type": "git",
