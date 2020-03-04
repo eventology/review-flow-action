@@ -16,7 +16,7 @@ async function main() {
   // update package.json
   await fs.writeFile(
     `${__dirname}/../package.json`,
-    JSON.stringify({ ...pkg, version: newVersion }),
+    JSON.stringify({ ...pkg, version: newVersion }, null, 2),
   )
 
   // build
@@ -29,7 +29,7 @@ async function main() {
   execSync(`git push origin master`)
 
   // push to releases/{version}
-  execSync(`git push origin releases/${newVersion}`)
+  execSync(`git push origin master:releases/${newVersion}`)
 
   console.info("Success!")
 }
