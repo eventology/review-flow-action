@@ -1,20 +1,19 @@
 import * as core from "@actions/core"
-import {
-  CheckRun,
-  getChecks,
-  getPullRequests,
-  mergePullRequest,
-  PullRequest,
-} from "./github"
+import { CheckRun, GitHubClient, PullRequest } from "./github"
 import { getErrorMessage } from "./helpers"
 
-export async function run() {
-  const result = await getPullRequests()
+export async function run(client: GitHubClient) {
+  const result = await client.getPullRequests()
+
+  const hasPassingChecks = async (pr: PullRequest) => {
+    const { data: checks } = await client.getChecks(pr)
+    return checks.check_runs.every(isCheckRunPassing)
+  }
 
   const tasks = result.data.map(async (pr) => {
     try {
       if (hasCorrectLabels(pr) && (await hasPassingChecks(pr))) {
-        await mergePullRequest(pr)
+        await client.mergePullRequest(pr)
         core.info(`Merged #${pr.number} (${pr.title})`)
       }
     } catch (error) {
@@ -38,11 +37,6 @@ const hasCorrectLabels = (pr: PullRequest) =>
   hasLabel(pr, "qa pass") &&
   doesNotHaveLabel(pr, "wip") &&
   doesNotHaveLabel(pr, "do not merge")
-
-const hasPassingChecks = async (pr: PullRequest) => {
-  const { data: checks } = await getChecks(pr)
-  return checks.check_runs.every(isCheckRunPassing)
-}
 
 const isCheckRunPassing = (run: CheckRun) =>
   run.status === "completed" && run.conclusion === "success"

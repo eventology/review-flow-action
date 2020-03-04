@@ -1,4 +1,3 @@
-import { mergePullRequest } from "./github"
 import { run } from "./run"
 
 let nextNumber = 0
@@ -10,7 +9,7 @@ const prWithLabels = (labels: string[]) => ({
 
 const mockMergablePr = prWithLabels(["code review pass", "qa pass"])
 
-jest.mock("./github", () => ({
+const mockClient = {
   getPullRequests: async () => ({
     data: [
       prWithLabels([]),
@@ -33,12 +32,12 @@ jest.mock("./github", () => ({
   }),
   mergePullRequest: jest.fn(),
   getChecks: async () => ({ data: { check_runs: [] } }),
-}))
+}
 
 it("merges with the correct labels, does not merge with wip/DNM labels", async () => {
-  await run()
-  expect(mergePullRequest).toHaveBeenCalledTimes(1)
-  expect(mergePullRequest).toHaveBeenCalledWith(mockMergablePr)
+  await run(mockClient as any)
+  expect(mockClient.mergePullRequest).toHaveBeenCalledTimes(1)
+  expect(mockClient.mergePullRequest).toHaveBeenCalledWith(mockMergablePr)
 })
 
 it.todo("does not merge if status checks are failing")
