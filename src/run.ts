@@ -1,39 +1,41 @@
 import * as core from "@actions/core"
+import { Context as GitHubContext } from "@actions/github/lib/context"
 import { CheckRun, GitHubClient, PullRequest } from "./github"
 import { getErrorMessage } from "./helpers"
 
 type RunOptions = {
   client: GitHubClient
+  context: GitHubContext
   mergeLabels: string[]
   noMergeLabels: string[]
 }
 
-export async function run({ client, mergeLabels, noMergeLabels }: RunOptions) {
-  const result = await client.getPullRequests()
+export async function run({
+  client,
+  context,
+  mergeLabels,
+  noMergeLabels,
+}: RunOptions) {
+  try {
+    const { data: pr } = await client.getPullRequest(context.issue.number)
 
-  const hasCorrectLabels = (pr: PullRequest) =>
-    mergeLabels.every((label) => hasLabel(pr, label)) &&
-    noMergeLabels.every((label) => doesNotHaveLabel(pr, label))
+    const hasCorrectLabels = () =>
+      mergeLabels.every((label) => hasLabel(pr, label)) &&
+      noMergeLabels.every((label) => doesNotHaveLabel(pr, label))
 
-  const hasPassingChecks = async (pr: PullRequest) => {
-    const { data: checks } = await client.getChecks(pr)
-    return checks.check_runs.every(isCheckRunPassing)
-  }
-
-  const tasks = result.data.map(async (pr) => {
-    try {
-      if (hasCorrectLabels(pr) && (await hasPassingChecks(pr))) {
-        await client.mergePullRequest(pr)
-        core.info(`Merged #${pr.number} (${pr.title})`)
-      }
-    } catch (error) {
-      // prettier-ignore
-      const errorMessage = `Could not merge ${prHumanFormat(pr)}: ${getErrorMessage(error)}`;
-      core.warning(errorMessage)
+    const hasPassingChecks = async () => {
+      const { data: checks } = await client.getChecks(pr)
+      return checks.check_runs.every(isCheckRunPassing)
     }
-  })
 
-  await Promise.all(tasks)
+    if (hasCorrectLabels() && (await hasPassingChecks())) {
+      await client.mergePullRequest(pr)
+      core.info(`Merged #${pr.number} (${pr.title})`)
+    }
+  } catch (error) {
+    const errorMessage = getErrorMessage(error)
+    core.warning(`Could not merge #${context.issue.number}: ${errorMessage}`)
+  }
 }
 
 const hasLabel = (pr: PullRequest, name: string) =>
@@ -44,5 +46,3 @@ const doesNotHaveLabel = (pr: PullRequest, name: string) =>
 
 const isCheckRunPassing = (run: CheckRun) =>
   run.status === "completed" && run.conclusion === "success"
-
-const prHumanFormat = (pr: PullRequest) => `#${pr.number} (${pr.title})`

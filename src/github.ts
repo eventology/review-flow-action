@@ -13,16 +13,17 @@ export function createClient(token: string) {
     repo: context.repo.repo,
   }
 
+  const getPullRequest = (pull_number: number) =>
+    github.pulls.get({ ...repoParams, pull_number })
+
   const getChecks = (pr: PullRequest) =>
     github.checks.listForRef({
       ...repoParams,
       ref: pr.head.ref,
     })
 
-  const getPullRequests = () => github.pulls.list(repoParams)
-
   const mergePullRequest = (pr: PullRequest) =>
     github.pulls.merge({ ...repoParams, pull_number: pr.number })
 
-  return { getChecks, getPullRequests, mergePullRequest }
+  return { getChecks, getPullRequest, mergePullRequest }
 }
