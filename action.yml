@@ -5,6 +5,12 @@ inputs:
   token:
     description: "github token"
     required: true
+  mergeLabels:
+    description: "The labels required to merge a PR"
+    required: true
+  noMergeLabels:
+    description: "If a PR has any of these labels, it will not be merged"
+    required: false
 runs:
   using: "node12"
   main: "dist/index.js"

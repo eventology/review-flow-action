@@ -35,7 +35,11 @@ const mockClient = {
 }
 
 it("merges with the correct labels, does not merge with wip/DNM labels", async () => {
-  await run(mockClient as any)
+  await run({
+    client: mockClient as any,
+    mergeLabels: ["code review pass", "qa pass"],
+    noMergeLabels: ["wip", "do not merge"],
+  })
   expect(mockClient.mergePullRequest).toHaveBeenCalledTimes(1)
   expect(mockClient.mergePullRequest).toHaveBeenCalledWith(mockMergablePr)
 })
