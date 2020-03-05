@@ -28,13 +28,13 @@ export async function run({
       doesNotHaveLabel(pr, label),
     )
 
-    core.info(`context ref: ${context.ref}`)
+    core.info(`context sha: ${context.sha}`)
     core.info(`check runs: ${JSON.stringify(checks.check_runs, null, 2)}`)
 
     const hasPassingChecks = checks.check_runs.every(
       (check) =>
         (check.status === "completed" && check.conclusion === "finished") ||
-        check.head_sha === context.ref,
+        check.head_sha === context.sha,
     )
 
     core.info(`Has merge labels: ${hasMergeLabels}`)
