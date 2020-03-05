@@ -1,6 +1,6 @@
 import * as core from "@actions/core"
 import { Context as GitHubContext } from "@actions/github/lib/context"
-import { CheckRun, GitHubClient, PullRequest } from "./github"
+import { GitHubClient, PullRequest } from "./github"
 import { getErrorMessage } from "./helpers"
 
 type RunOptions = {
@@ -20,7 +20,6 @@ export async function run({
 
   try {
     const { data: pr } = await client.getPullRequest(context.issue.number)
-    const { data: checks } = await client.getChecks(pr)
 
     const hasMergeLabels = mergeLabels.every((label) => hasLabel(pr, label))
 
@@ -28,20 +27,10 @@ export async function run({
       doesNotHaveLabel(pr, label),
     )
 
-    core.info(`context sha: ${context.sha}`)
-    core.info(`check runs: ${JSON.stringify(checks.check_runs, null, 2)}`)
-
-    const hasPassingChecks = checks.check_runs.every(
-      (check) =>
-        (check.status === "completed" && check.conclusion === "finished") ||
-        check.head_sha === context.sha,
-    )
-
     core.info(`Has merge labels: ${hasMergeLabels}`)
     core.info(`Does not have no merge labels: ${doesNotHaveNoMergeLabels}`)
-    core.info(`Has passing checks: ${hasPassingChecks}`)
 
-    if (hasMergeLabels && doesNotHaveNoMergeLabels && hasPassingChecks) {
+    if (hasMergeLabels && doesNotHaveNoMergeLabels) {
       await client.mergePullRequest(pr)
       core.info(`Merged #${pr.number} (${pr.title})`)
     } else {
@@ -58,6 +47,3 @@ const hasLabel = (pr: PullRequest, name: string) =>
 
 const doesNotHaveLabel = (pr: PullRequest, name: string) =>
   pr.labels.every((label) => label.name.toLowerCase() !== name.toLowerCase())
-
-const isCheckRunPassing = (run: CheckRun) =>
-  run.status === "completed" && run.conclusion === "success"
