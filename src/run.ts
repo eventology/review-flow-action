@@ -16,21 +16,29 @@ export async function run({
   mergeLabels,
   noMergeLabels,
 }: RunOptions) {
+  core.info(`Checking for merge labels:`)
+
   try {
     const { data: pr } = await client.getPullRequest(context.issue.number)
+    const { data: checks } = await client.getChecks(pr)
 
-    const hasCorrectLabels = () =>
-      mergeLabels.every((label) => hasLabel(pr, label)) &&
-      noMergeLabels.every((label) => doesNotHaveLabel(pr, label))
+    const hasMergeLabels = mergeLabels.every((label) => hasLabel(pr, label))
 
-    const hasPassingChecks = async () => {
-      const { data: checks } = await client.getChecks(pr)
-      return checks.check_runs.every(isCheckRunPassing)
-    }
+    const doesNotHaveNoMergeLabels = noMergeLabels.every((label) =>
+      doesNotHaveLabel(pr, label),
+    )
 
-    if (hasCorrectLabels() && (await hasPassingChecks())) {
+    const hasPassingChecks = checks.check_runs.every(isCheckRunPassing)
+
+    core.info(`Has merge labels: ${hasMergeLabels}`)
+    core.info(`Does not have no merge labels: ${doesNotHaveNoMergeLabels}`)
+    core.info(`Has passing checks: ${hasPassingChecks}`)
+
+    if (hasMergeLabels && doesNotHaveNoMergeLabels && hasPassingChecks) {
       await client.mergePullRequest(pr)
       core.info(`Merged #${pr.number} (${pr.title})`)
+    } else {
+      core.info("Conditions did not pass, could not merge")
     }
   } catch (error) {
     const errorMessage = getErrorMessage(error)
