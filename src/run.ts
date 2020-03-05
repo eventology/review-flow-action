@@ -28,7 +28,14 @@ export async function run({
       doesNotHaveLabel(pr, label),
     )
 
-    const hasPassingChecks = checks.check_runs.every(isCheckRunPassing)
+    core.info(`context ref: ${context.ref}`)
+    core.info(`check runs: ${JSON.stringify(checks.check_runs, null, 2)}`)
+
+    const hasPassingChecks = checks.check_runs.every(
+      (check) =>
+        (check.status === "completed" && check.conclusion === "finished") ||
+        check.head_sha === context.ref,
+    )
 
     core.info(`Has merge labels: ${hasMergeLabels}`)
     core.info(`Does not have no merge labels: ${doesNotHaveNoMergeLabels}`)
