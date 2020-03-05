@@ -5,10 +5,10 @@ inputs:
   token:
     description: "github token"
     required: true
-  mergeLabels:
+  merge_labels:
     description: "The labels required to merge a PR"
     required: true
-  noMergeLabels:
+  no_merge_labels:
     description: "If a PR has any of these labels, it will not be merged"
     required: false
 runs:
